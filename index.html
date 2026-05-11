@@ -16,9 +16,10 @@
 
     .widget {
       width: 100%;
+      max-width: 320px;
       background: #fff;
       border-top: 3px solid #FEDD00;
-      padding: 14px 16px 12px;
+      padding: 14px 16px 4px;
     }
 
     .widget-title {
@@ -27,12 +28,7 @@
       text-transform: uppercase;
       letter-spacing: 0.07em;
       color: #111;
-      margin-bottom: 12px;
-    }
-
-    /* TradingView Widget Container */
-    .tv-widget {
-      width: 100%;
+      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -41,22 +37,20 @@
 <div class="widget">
   <div class="widget-title">Michelin Aktie · ML.PA</div>
 
-  <div class="tv-widget">
-    <!-- TradingView Widget BEGIN -->
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-      {
-        "symbol": "EURONEXT:ML",
-        "width": "100%",
-        "locale": "de_DE",
-        "colorTheme": "light",
-        "isTransparent": true
-      }
-      </script>
-    </div>
-    <!-- TradingView Widget END -->
+  <!-- TradingView Widget BEGIN -->
+  <div class="tradingview-widget-container">
+    <div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+    {
+      "symbol": "EURONEXT:ML",
+      "width": "100%",
+      "locale": "de_DE",
+      "colorTheme": "light",
+      "isTransparent": true
+    }
+    </script>
   </div>
+  <!-- TradingView Widget END -->
 </div>
 
 </body>
