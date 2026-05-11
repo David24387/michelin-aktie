@@ -27,96 +27,13 @@
       text-transform: uppercase;
       letter-spacing: 0.07em;
       color: #111;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
-    .row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding: 6px 0;
-      border-bottom: 1px solid #f0f0f0;
+    /* TradingView Widget Container */
+    .tv-widget {
+      width: 100%;
     }
-    .row:last-of-type {
-      border-bottom: none;
-    }
-
-    .row-label {
-      font-size: 12px;
-      color: #888;
-    }
-
-    .row-value {
-      font-size: 13px;
-      font-weight: 600;
-      color: #111;
-      text-align: right;
-    }
-
-    .row-value.positive { color: #2a7a2a; }
-    .row-value.negative { color: #c0392b; }
-
-    .price-block {
-      margin-bottom: 10px;
-    }
-
-    .price-main {
-      font-size: 30px;
-      font-weight: 700;
-      color: #111;
-      line-height: 1;
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    .price-sub {
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .price-sub.positive { color: #2a7a2a; }
-    .price-sub.negative { color: #c0392b; }
-
-    .footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
-
-    .status {
-      font-size: 10px;
-      color: #bbb;
-      line-height: 1.3;
-    }
-    .status.error { color: #c0392b; }
-
-    .refresh-btn {
-      font-size: 10px;
-      font-family: inherit;
-      font-weight: 700;
-      color: #111;
-      background: #FEDD00;
-      border: none;
-      padding: 4px 10px;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      white-space: nowrap;
-    }
-    .refresh-btn:hover { background: #f0cc00; }
-    .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .spinner {
-      display: inline-block;
-      width: 8px; height: 8px;
-      border: 2px solid #ddd;
-      border-top-color: #888;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin-right: 3px;
-      vertical-align: middle;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -124,91 +41,23 @@
 <div class="widget">
   <div class="widget-title">Michelin Aktie · ML.PA</div>
 
-  <div class="price-block">
-    <span class="price-main" id="price">—</span>
-    <span class="price-sub" id="changePct">—</span>
-  </div>
-
-  <div class="row">
-    <span class="row-label">Veränderung</span>
-    <span class="row-value" id="changeAbs">—</span>
-  </div>
-  <div class="row">
-    <span class="row-label">Vortag</span>
-    <span class="row-value" id="prevClose">—</span>
-  </div>
-  <div class="row">
-    <span class="row-label">Tageshoch</span>
-    <span class="row-value" id="high">—</span>
-  </div>
-  <div class="row">
-    <span class="row-label">Tagestief</span>
-    <span class="row-value" id="low">—</span>
-  </div>
-
-  <div class="footer">
-    <span class="status" id="status"><span class="spinner"></span> Lädt…</span>
-    <button class="refresh-btn" id="refreshBtn" onclick="loadStock()">↻ Aktualisieren</button>
+  <div class="tv-widget">
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+      {
+        "symbol": "EURONEXT:ML",
+        "width": "100%",
+        "locale": "de_DE",
+        "colorTheme": "light",
+        "isTransparent": true
+      }
+      </script>
+    </div>
+    <!-- TradingView Widget END -->
   </div>
 </div>
-
-<script>
-  const API_KEY  = "40BNRH2X0GHCP375";
-  const SYMBOL   = "ML.PA";
-  const INTERVAL = 3600000;
-
-  function fmt(n) {
-    return parseFloat(n).toFixed(2).replace(".", ",");
-  }
-
-  function setStatus(html, isError) {
-    const el = document.getElementById("status");
-    el.className = "status" + (isError ? " error" : "");
-    el.innerHTML = html;
-  }
-
-  async function loadStock() {
-    const btn = document.getElementById("refreshBtn");
-    btn.disabled = true;
-    setStatus('<span class="spinner"></span> Lädt…');
-
-    try {
-      const res  = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${SYMBOL}&apikey=${API_KEY}`);
-      const data = await res.json();
-      const q    = data["Global Quote"];
-
-      if (!q || !q["05. price"]) throw new Error("Keine Daten");
-
-      const price = parseFloat(q["05. price"]);
-      const prev  = parseFloat(q["08. previous close"]);
-      const high  = parseFloat(q["03. high"]);
-      const low   = parseFloat(q["04. low"]);
-      const diff  = price - prev;
-      const pct   = (diff / prev) * 100;
-      const pos   = diff >= 0;
-      const sign  = pos ? "+" : "";
-      const cls   = pos ? "positive" : "negative";
-
-      document.getElementById("price").textContent     = fmt(price) + " €";
-      document.getElementById("changePct").textContent = sign + fmt(pct) + " %";
-      document.getElementById("changePct").className   = "price-sub " + cls;
-      document.getElementById("changeAbs").textContent = sign + fmt(diff) + " €";
-      document.getElementById("changeAbs").className   = "row-value " + cls;
-      document.getElementById("prevClose").textContent = fmt(prev) + " €";
-      document.getElementById("high").textContent      = fmt(high) + " €";
-      document.getElementById("low").textContent       = fmt(low) + " €";
-
-      setStatus("Stand: " + new Date().toLocaleTimeString("de-DE"));
-    } catch (e) {
-      setStatus("Fehler: " + e.message, true);
-    } finally {
-      btn.disabled = false;
-    }
-  }
-
-  loadStock();
-  setInterval(loadStock, INTERVAL);
-</script>
 
 </body>
 </html>
